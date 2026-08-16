@@ -1,0 +1,57 @@
+name: Nero Bot V2 Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  nero-bot:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Nero Bot
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            python3 \
+            pkg-config \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libjpeg-dev \
+            libgif-dev \
+            librsvg2-dev
+
+      - name: Show environment
+        run: |
+          node --version
+          npm --version
+          uname -a
+
+      - name: Install dependencies
+        run: |
+          npm install --legacy-peer-deps
+
+      - name: Check required files
+        run: |
+          test -f index.js
+          test -f Nerov2.js
+          test -f config.json
+          test -f package.json
+
+      - name: Check native modules
+        run: |
+          node -e "require('bcrypt'); console.log('bcrypt OK')"
+          node -e "require('sqlite3'); console.log('sqlite3 OK')"
+          node -e "require('canvas'); console.log('canvas OK')"
+
+      - name: Start Nero Bot
+        run: node index.js
